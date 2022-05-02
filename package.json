@@ -1,0 +1,39 @@
+{
+  "name": "ERC721AS",
+  "version": "1.0.1",
+  "description": "",
+  "files": [
+    "contracts/**/*.sol",
+    "!/contracts/tests/**/*"
+  ],
+  "scripts": {
+    "test": "npx hardhat test",
+    "test:gas": "REPORT_GAS=true npx hardhat test"
+  },
+  "keywords": [
+    "NFT",
+    "Etherium",
+    "ERC721",
+    "Schooling"
+  ],
+  "author": "OG Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.4.1",
+    "erc721a": "^3.2.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.8.2",
+    "hardhat-abi-exporter": "^2.7.2",
+    "hardhat-gas-reporter": "^1.0.8",
+    "@nomiclabs/hardhat-ethers": "^2.0.4",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.5.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hongin-rhie/ERC721AS"
+  }
+}
