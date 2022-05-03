@@ -124,44 +124,53 @@ contract ERC721AS is Context, ERC165, IERC721AS {
      * Used for optimizing and readablilty.
      */
     function _schoolingTotal(
-        uint256 currentTime,
-        TokenStatus memory sData,
-        SchoolingPolicy memory pData
+        uint40 currentTime,
+        TokenStatus memory _status,
+        SchoolingPolicy memory _policy
     ) internal pure returns (uint256) {
+        // If schooling is on different phase, existing total = 0
+        if (_status.schoolingId != _policy.schoolingId) {
+            _status.schoolingTotal = 0;
+        }
+
         // If schooling is not begun yet, total = 0
-        if (pData.schoolingBegin == 0 || currentTime < pData.schoolingBegin) {
+        if (_policy.schoolingBegin == 0 || currentTime < _policy.schoolingBegin) {
             return 0;
         }
 
-        if (pData.schoolingEnd < currentTime) {
-            if (sData.schoolingTimestamp < pData.schoolingBegin) {
-                return pData.schoolingEnd - pData.schoolingBegin;
+        // If schooling is End, 
+        if (_policy.schoolingEnd < currentTime) {
+            if (_status.schoolingTimestamp < _policy.schoolingBegin) {
+                return uint256(_policy.schoolingEnd - _policy.schoolingBegin);
             }
-            if (sData.schoolingTimestamp + pData.breaktime > pData.schoolingEnd)
-                return sData.schoolingTotal;
-            return
-                sData.schoolingTotal +
-                pData.schoolingEnd -
-                pData.breaktime -
-                sData.schoolingTimestamp;
+            if (_status.schoolingTimestamp + _policy.breaktime > _policy.schoolingEnd) {
+                return uint256(_status.schoolingTotal);
+            }
+            return uint256(
+                _status.schoolingTotal +
+                _policy.schoolingEnd -
+                _policy.breaktime -
+                _status.schoolingTimestamp
+            );
         }
 
         if (
-            sData.schoolingTimestamp == 0 ||
-            sData.schoolingTimestamp < pData.schoolingBegin
+            _status.schoolingTimestamp == 0 ||
+            _status.schoolingTimestamp < _policy.schoolingBegin
         ) {
-            return currentTime - uint256(pData.schoolingBegin);
+            return uint256(currentTime - _policy.schoolingBegin);
         }
 
-        if (sData.schoolingTimestamp + pData.breaktime > currentTime) {
-            return uint256(sData.schoolingTotal);
+        if (_status.schoolingTimestamp + _policy.breaktime > currentTime) {
+            return uint256(_status.schoolingTotal);
         }
 
-        return
-            uint256(sData.schoolingTotal) +
+        return uint256(
+            _status.schoolingTotal +
             currentTime -
-            uint256(sData.schoolingTimestamp) -
-            uint256(pData.breaktime);
+            _status.schoolingTimestamp -
+            _policy.breaktime
+        );
     }
 
     /**
@@ -176,7 +185,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         if (!_exists(tokenId)) revert SchoolingQueryForNonexistentToken();
         return
             _schoolingTotal(
-                block.timestamp,
+                uint40(block.timestamp),
                 _tokenStatus[tokenId],
                 _schoolingPolicy
             );
@@ -227,22 +236,56 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         }
     }
 
-    function _setSchoolingBreaktime(uint32 _breaktime) internal {
+    function _setSchoolingBreaktime(uint40 _breaktime) internal {
         unchecked {
             _schoolingPolicy.breaktime = _breaktime;
         }
     }
 
-    function _setSchoolingBegin(uint48 _begin) internal {
+    function _setSchoolingBegin(uint40 _begin) internal {
         unchecked {
             _schoolingPolicy.schoolingBegin = _begin;
         }
     }
 
-    function _setSchoolingEnd(uint48 _end) internal {
+    function _setSchoolingEnd(uint40 _end) internal {
         unchecked {
             _schoolingPolicy.schoolingEnd = _end;
         }
+    }
+
+    function _setSchoolingId(uint8 _schoolingId) internal {
+        unchecked {
+            _schoolingPolicy.schoolingId = _schoolingId;
+        }
+    }
+
+    /**
+     * Apply new schooling policy.
+     * Please use this function to start new season.
+     *
+     * schoolingId will increase automatically.
+     * If new schooling duration is duplicated to existing duration,
+     * IT COULD BE ERROR
+     */
+    function _applyNewSchoolingPolicy(
+        uint40 _begin,
+        uint40 _end,
+        uint40 _breaktime
+    ) internal {
+        _beforeApplyNewPolicy(_begin, _end, _breaktime);
+
+        SchoolingPolicy memory _policy = _schoolingPolicy;
+        if(_policy.schoolingEnd != 0) {
+            _policy.schoolingId++;
+        }
+        _policy.schoolingBegin = _begin;
+        _policy.schoolingEnd = _end;
+        _policy.breaktime = _breaktime;
+
+        _schoolingPolicy = _policy;
+
+        _afterApplyNewPolicy(_begin, _end, _breaktime);
     }
 
     /**
@@ -266,17 +309,26 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         }
     }
 
+    function schoolingId() external view override returns (uint256) {
+        unchecked {
+            return uint256(_schoolingPolicy.schoolingId);
+        }
+    }
+
     /**
      * Switching token's schooling status to off in forced way
      */
+
     function _recordSchoolingStatusChange(uint256 tokenId) internal {
-        TokenStatus memory schoolingData = _tokenStatus[tokenId];
-        uint256 currentTime = uint256(block.timestamp);
-        schoolingData.schoolingTotal = uint32(
-            _schoolingTotal(currentTime, schoolingData, _schoolingPolicy)
+        TokenStatus memory _status = _tokenStatus[tokenId];
+        SchoolingPolicy memory _policy = _schoolingPolicy;
+        uint40 currentTime = uint40(block.timestamp);
+        _status.schoolingTotal = uint40(
+            _schoolingTotal(currentTime, _status, _policy)
         );
-        schoolingData.schoolingTimestamp = uint48(currentTime);
-        _tokenStatus[tokenId] = schoolingData;
+        _status.schoolingId = _schoolingPolicy.schoolingId;
+        _status.schoolingTimestamp = currentTime;
+        _tokenStatus[tokenId] = _status;
     }
 
     /**
@@ -788,6 +840,21 @@ contract ERC721AS is Context, ERC165, IERC721AS {
             }
         }
     }
+
+    function _beforeApplyNewPolicy(
+        uint40 _begin,
+        uint40 _end,
+        uint40 _breaktime
+    ) internal virtual {
+    }
+
+    function _afterApplyNewPolicy(
+        uint40 _begin,
+        uint40 _end,
+        uint40 _breaktime
+    ) internal virtual {
+    }
+
 
     /**
      * @dev Hook that is called before a set of serially-ordered token ids are about to be transferred. This includes minting.

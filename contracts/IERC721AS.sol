@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-
 interface IERC721AS is IERC721, IERC721Metadata {
     /**
      * The caller must own the token or be an approved operator.
@@ -81,9 +80,12 @@ interface IERC721AS is IERC721, IERC721Metadata {
         // The address of the owner.
         address owner;
         // Keeps track of the latest time User toggled schooling.
-        uint48 schoolingTimestamp;
+        uint40 schoolingTimestamp;
         // Keeps track of the total time of schooling.
-        uint32 schoolingTotal;
+        // Left 4Most bit
+        uint40 schoolingTotal;
+        // State to support multiple seasons
+        uint8  schoolingId;
         // Whether the token has been burned.
         bool burned;
     }
@@ -92,9 +94,10 @@ interface IERC721AS is IERC721, IERC721Metadata {
     struct SchoolingPolicy {
         uint64 alpha;
         uint64 beta;
-        uint32 breaktime;
-        uint48 schoolingBegin;
-        uint48 schoolingEnd;
+        uint40 schoolingBegin;
+        uint40 schoolingEnd;
+        uint8  schoolingId;
+        uint40 breaktime;
     }
 
     /**
@@ -124,6 +127,11 @@ interface IERC721AS is IERC721, IERC721Metadata {
      * @dev Returns time when schooling end
      */
     function schoolingEnd() external view returns (uint256);
+
+    /**
+     * @dev Returns identifier of schooling phase
+     */
+    function schoolingId() external view returns (uint256);
 
     /**
      * @dev Sets the time period which blocks users from transfering their tokens.

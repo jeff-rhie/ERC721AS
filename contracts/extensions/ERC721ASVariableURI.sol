@@ -131,13 +131,12 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         virtual
         returns (string memory)
     {
-        if (!_exists(tokenId)) revert SchoolingQueryForNonexistentToken();
         TokenStatus memory sData = _tokenStatus[tokenId];
-        SchoolingPolicy memory pData = _schoolingPolicy;
-        uint256 schoolingTotal = _schoolingTotal(block.timestamp, sData, pData);
+        SchoolingPolicy memory _policy = _schoolingPolicy;
+        uint256 schoolingTotal = uint256(_schoolingTotal(uint40(block.timestamp), sData, _policy));
         uint256 index;
         uint256 counter = 0;
-        for (uint256 i = 0; i < pData.alpha; i++) {
+        for (uint256 i = 0; i < _policy.alpha; i++) {
             if (
                 _isExistingCheckpoint(_schoolingCheckpoint[i]) &&
                 _schoolingCheckpoint[i] <= schoolingTotal
@@ -168,7 +167,6 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         if (index >= _schoolingPolicy.beta) revert CheckpointOutOfArray();
         uint256 i = 0;
         uint256 counter = 0;
-        if (_schoolingPolicy.beta <= index) revert CheckpointOutOfArray();
         while (true) {
             if (_isExistingCheckpoint(_schoolingCheckpoint[i])) {
                 counter++;
@@ -193,7 +191,6 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         if (index >= _schoolingPolicy.beta) revert CheckpointOutOfArray();
         uint256 i = 0;
         uint256 counter = 0;
-        if (_schoolingPolicy.beta <= index) revert CheckpointOutOfArray();
         while (true) {
             if (_isExistingCheckpoint(_schoolingCheckpoint[i])) {
                 counter++;
@@ -209,4 +206,18 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
     function numOfCheckpoints() external view override returns (uint256) {
         return _schoolingPolicy.beta;
     }
+
+    function _beforeApplyNewPolicy(
+        uint40 _begin,
+        uint40 _end,
+        uint40 _breaktime
+    ) internal virtual override {
+        super._beforeApplyNewPolicy(_begin, _end, _breaktime);
+        SchoolingPolicy memory _policy = _schoolingPolicy;
+        _policy.alpha = 0;
+        _policy.beta = 0;
+        
+        _schoolingPolicy = _policy;
+    }
+
 }

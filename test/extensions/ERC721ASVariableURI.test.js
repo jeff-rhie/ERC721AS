@@ -14,6 +14,7 @@ describe("ERC721ASVariableURI", async function () {
     it(`addCheckpoint * 5 -> remove(2) -> replace(1),(3) -> test`, async function () {
       const simTime = Math.floor(Date.now() / 1000) + 300000;
       const toCheckpoint = (t) => { return (t % 2 == 1) ? t - 1 : t; };
+
       await network.provider.send("evm_setNextBlockTimestamp", [simTime]);
       await network.provider.send("evm_mine");
 
@@ -30,14 +31,84 @@ describe("ERC721ASVariableURI", async function () {
       var arr = [];
       var uri = [];
       for (i = 0; i < 5; i++) {
-        const checkpoint = 1000 * (i + 1);
-        arr.push(toCheckpoint(checkpoint));
+        const checkpoint = toCheckpoint(1000 * (i + 1));
+        arr.push(checkpoint);
         uri.push(`${i}/`);
 
         await tester.addCheckpoint(checkpoint, `${i}/`);
         expect(
           (await tester.checkpointAtIndex(i)).toNumber()
-        ).to.equal(toCheckpoint(checkpoint));
+        ).to.equal(checkpoint);
+        expect(await tester.tokenURI(i)).to.equal(`default/${i}`);
+      }
+
+
+      await tester.removeCheckpoint(2);
+      await tester.replaceCheckpoint(2500, 'x', 1);
+      await tester.replaceCheckpoint(7500, 'y', 3);
+
+      expect((await tester.checkpointAtIndex(0)).toNumber()).to.equal(arr[0]);
+      expect(await tester.uriAtIndex(0)).to.equal(uri[0]);
+
+      expect((await tester.checkpointAtIndex(1)).toNumber()).to.equal(2500);
+      expect(await tester.uriAtIndex(1)).to.equal('x');
+
+      expect((await tester.checkpointAtIndex(2)).toNumber()).to.equal(arr[3]);
+      expect(await tester.uriAtIndex(2)).to.equal(uri[3]);
+
+      expect((await tester.checkpointAtIndex(3)).toNumber()).to.equal(7500);
+      expect(await tester.uriAtIndex(3)).to.equal('y');
+
+      try {
+        await tester.checkpointAtIndex(4);
+        expect(true).to.equal(false);
+      } catch (e) {
+        expect(true).to.equal(true);
+      }
+      try {
+        await tester.uriAtIndex(4);
+        expect(true).to.equal(false);
+      } catch (e) {
+        expect(true).to.equal(true);
+      }
+      try {
+        await tester.tokenURI(4);
+        expect(true).to.equal(false);
+      } catch (e) {
+        expect(true).to.equal(true);
+      }
+
+      tester.applyNewSchoolingPolicy(simTime+100, simTime+300, 10);
+
+      try {
+        await tester.checkpointAtIndex(0);
+        expect(true).to.equal(false);
+      } catch (e) {
+        expect(true).to.equal(true);
+      }
+      try {
+        await tester.uriAtIndex(0);
+        expect(true).to.equal(false);
+      } catch (e) {
+        expect(true).to.equal(true);
+      }
+      try {
+        await tester.tokenURI(0);
+        expect(true).to.equal(false);
+      } catch (e) {
+        expect(true).to.equal(true);
+      }
+
+      arr = [];
+      uri = [];
+      for (i = 0; i < 5; i++) {
+        const checkpoint = toCheckpoint(1000 * (i + 1));
+        arr.push(checkpoint);
+        uri.push(`${i}/`);
+        await tester.addCheckpoint(checkpoint, `${i}/`);
+        expect(
+          (await tester.checkpointAtIndex(i)).toNumber()
+        ).to.equal(checkpoint);
         expect(await tester.tokenURI(i)).to.equal(`default/${i}`);
       }
 
@@ -75,6 +146,7 @@ describe("ERC721ASVariableURI", async function () {
       } catch (e) {
         expect(true).to.equal(true);
       }
+
 
       /**
        * init Schooling Policy
@@ -342,7 +414,6 @@ describe("ERC721ASVariableURI", async function () {
       ).to.equal(
         true
       );
-
 
       expect(
         Math.abs(
