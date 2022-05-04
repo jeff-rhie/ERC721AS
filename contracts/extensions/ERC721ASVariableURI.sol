@@ -8,8 +8,9 @@ import "../interfaces/IERC721ASVariableURI.sol";
 abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
     using Strings for uint256;
     /*
-     * alpha : current index
-     * beta : number of checkpoint
+     * @dev this contract use _schoolingPolicy.alpha & beta
+     * - alpha : current index
+     * - beta : number of checkpoint
      */
     // Presenting whether checkpoint is deleted or not.
     // "1" represent deleted.
@@ -133,7 +134,9 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
     {
         TokenStatus memory sData = _tokenStatus[tokenId];
         SchoolingPolicy memory _policy = _schoolingPolicy;
-        uint256 schoolingTotal = uint256(_schoolingTotal(uint40(block.timestamp), sData, _policy));
+        uint256 schoolingTotal = uint256(
+            _schoolingTotal(uint40(block.timestamp), sData, _policy)
+        );
         uint256 index;
         uint256 counter = 0;
         for (uint256 i = 0; i < _policy.alpha; i++) {
@@ -216,8 +219,7 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         SchoolingPolicy memory _policy = _schoolingPolicy;
         _policy.alpha = 0;
         _policy.beta = 0;
-        
+
         _schoolingPolicy = _policy;
     }
-
 }

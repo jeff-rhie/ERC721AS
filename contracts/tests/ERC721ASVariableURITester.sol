@@ -26,14 +26,18 @@ contract ERC721ASVariableURITester is ERC721ASVariableURI {
         _setSchoolingBreaktime(uint40(breaktime));
     }
 
-    function applyNewSchoolingPolicy(uint256 _begin, uint256 _end, uint256 _breaktime) public {
+    function applyNewSchoolingPolicy(
+        uint256 _begin,
+        uint256 _end,
+        uint256 _breaktime
+    ) public {
         _applyNewSchoolingPolicy(
             uint40(_begin),
             uint40(_end),
             uint40(_breaktime)
         );
     }
- 
+
     function addCheckpoint(uint256 checkpoint, string memory uri) public {
         _addCheckpoint(checkpoint, uri);
     }
@@ -49,7 +53,8 @@ contract ERC721ASVariableURITester is ERC721ASVariableURI {
     function removeCheckpoint(uint256 index) public {
         _removeCheckpoint(index);
     }
-   function totalMinted() public view returns (uint256) {
+
+    function totalMinted() public view returns (uint256) {
         return _totalMinted();
     }
 

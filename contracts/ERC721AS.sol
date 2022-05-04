@@ -192,7 +192,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     }
 
     /**
-     * Returns whether token is schooling or not.
+     * Returns whether token is taking break
      */
     function _isTakingBreak(uint256 tokenId) internal view returns (bool) {
         unchecked {
@@ -206,6 +206,9 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         }
     }
 
+    /**
+     * @dev use this to get first custom data in schooling policy.
+     */
     function _getSchoolingAlpha() internal view returns (uint256) {
         unchecked {
             return uint256(_schoolingPolicy.alpha);
@@ -213,7 +216,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     }
 
     /**
-     * @dev use this for auxiliary data in schooling policy.
+     * @dev use this to set first custom data in schooling policy.
      */
     function _setSchoolingAlpha(uint64 _alpha) internal {
         unchecked {
@@ -221,6 +224,9 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         }
     }
 
+    /**
+     * @dev use this to get second custom data in schooling policy.
+     */
     function _getSchoolingBeta() internal view returns (uint256) {
         unchecked {
             return uint256(_schoolingPolicy.beta);
@@ -228,7 +234,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     }
 
     /**
-     * @dev use this for auxiliary data in schooling policy.
+     * @dev use this to set second custom data in schooling policy.
      */
     function _setSchoolingBeta(uint64 _beta) internal {
         unchecked {
@@ -242,21 +248,72 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         }
     }
 
+    /**
+     * @dev set schooling begin manually
+     * changing it manually could be resulted in unexpected result
+     * please do not use it witout reasonable reason
+     */
     function _setSchoolingBegin(uint40 _begin) internal {
         unchecked {
             _schoolingPolicy.schoolingBegin = _begin;
         }
     }
 
+    /**
+     * @dev set schooling end manually
+     * changing it manually could be resulted in unexpected result
+     * please do not use it witout reasonable reason
+     */
     function _setSchoolingEnd(uint40 _end) internal {
         unchecked {
             _schoolingPolicy.schoolingEnd = _end;
         }
     }
 
+    /**
+     * @dev set schooling identifier manually
+     * changing it manually could be resulted in unexpected result
+     * please do not use it witout reasonable reason
+     */
     function _setSchoolingId(uint8 _schoolingId) internal {
         unchecked {
             _schoolingPolicy.schoolingId = _schoolingId;
+        }
+    }
+
+    /**
+     * Returns period of timelock.
+     */
+    function schoolingBreaktime() external view override returns (uint256) {
+        unchecked {
+            return uint256(_schoolingPolicy.breaktime);
+        }
+    }
+
+    /**
+     * Returns when schooling begin in timestamp
+     */
+    function schoolingBegin() external view override returns (uint256) {
+        unchecked {
+            return uint256(_schoolingPolicy.schoolingBegin);
+        }
+    }
+
+    /**
+     * Returns when schooling end in timestamp
+     */
+    function schoolingEnd() external view override returns (uint256) {
+        unchecked {
+            return uint256(_schoolingPolicy.schoolingEnd);
+        }
+    }
+
+    /**
+     * Returns when schooling identifier
+     */
+    function schoolingId() external view override returns (uint256) {
+        unchecked {
+            return uint256(_schoolingPolicy.schoolingId);
         }
     }
 
@@ -288,31 +345,32 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         _afterApplyNewPolicy(_begin, _end, _breaktime);
     }
 
-    /**
-     * Returns period of timelock.
+ /**
+     * @dev Hook that is called before call applyNewSchoolingPolicy.
+     *
+     * _begin     - timestamp schooling begin
+     * _end       - timestamp schooling end
+     * _breaktime - breaktime in second
      */
-    function schoolingBreaktime() external view override returns (uint256) {
-        unchecked {
-            return uint256(_schoolingPolicy.breaktime);
-        }
+    function _beforeApplyNewPolicy(
+        uint40 _begin,
+        uint40 _end,
+        uint40 _breaktime
+    ) internal virtual {
     }
 
-    function schoolingBegin() external view override returns (uint256) {
-        unchecked {
-            return uint256(_schoolingPolicy.schoolingBegin);
-        }
-    }
-
-    function schoolingEnd() external view override returns (uint256) {
-        unchecked {
-            return uint256(_schoolingPolicy.schoolingEnd);
-        }
-    }
-
-    function schoolingId() external view override returns (uint256) {
-        unchecked {
-            return uint256(_schoolingPolicy.schoolingId);
-        }
+ /**
+     * @dev Hook that is called before call applyNewSchoolingPolicy.
+     *
+     * _begin     - timestamp schooling begin
+     * _end       - timestamp schooling end
+     * _breaktime - breaktime in second
+     */
+    function _afterApplyNewPolicy(
+        uint40 _begin,
+        uint40 _end,
+        uint40 _breaktime
+    ) internal virtual {
     }
 
     /**
@@ -331,6 +389,21 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         _tokenStatus[tokenId] = _status;
     }
 
+/*
+*  ______ _____   _____ ______ ___  __          
+* |  ____|  __ \ / ____|____  |__ \/_ |   /\    
+* | |__  | |__) | |        / /   ) || |  /  \   
+* |  __| |  _  /| |       / /   / / | | / /\ \  
+* | |____| | \ \| |____  / /   / /_ | |/ ____ \ 
+* |______|_|  \_\\_____|/_/   |____||_/_/    \_\
+*
+* ERC721A implementation below.
+* - overrided _beforeTokenTransfers to support Auto Schooling
+* - remove tracking & keeping it into TokenStatus features
+*
+*
+*/                                               
+                                            
     /**
      * @dev Burned tokens are calculated here, use _totalMinted() if you want to count just minted tokens.
      */
@@ -840,21 +913,6 @@ contract ERC721AS is Context, ERC165, IERC721AS {
             }
         }
     }
-
-    function _beforeApplyNewPolicy(
-        uint40 _begin,
-        uint40 _end,
-        uint40 _breaktime
-    ) internal virtual {
-    }
-
-    function _afterApplyNewPolicy(
-        uint40 _begin,
-        uint40 _end,
-        uint40 _breaktime
-    ) internal virtual {
-    }
-
 
     /**
      * @dev Hook that is called before a set of serially-ordered token ids are about to be transferred. This includes minting.
