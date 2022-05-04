@@ -210,6 +210,13 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         return _schoolingPolicy.beta;
     }
 
+    /**
+     * @dev Hook that is called before call applyNewSchoolingPolicy.
+     *
+     * _begin     - timestamp schooling begin
+     * _end       - timestamp schooling end
+     * _breaktime - breaktime in second
+     */
     function _beforeApplyNewPolicy(
         uint40 _begin,
         uint40 _end,

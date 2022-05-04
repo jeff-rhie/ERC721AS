@@ -78,6 +78,9 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
+    /*
+    * @dev see { IERC721AS - SchoolingPolicy }
+    */
     SchoolingPolicy internal _schoolingPolicy;
 
     constructor(string memory name_, string memory symbol_) {
