@@ -123,6 +123,9 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     }
 
     /**
+     * @dev if you want to change algorithm to calculate total value
+     * override this function
+     *
      * Returns token's total time of shcooling.
      * Used for optimizing and readablilty.
      */
@@ -130,7 +133,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         uint40 currentTime,
         TokenStatus memory _status,
         SchoolingPolicy memory _policy
-    ) internal pure returns (uint256) {
+    ) internal pure virtual returns (uint256) {
         // If schooling is on different phase, existing total = 0
         if (_status.schoolingId != _policy.schoolingId) {
             _status.schoolingTotal = 0;
