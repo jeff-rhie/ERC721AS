@@ -134,7 +134,7 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
     {
         TokenStatus memory sData = _tokenStatus[tokenId];
         SchoolingPolicy memory _policy = _schoolingPolicy;
-        uint256 schoolingTotal = uint256(
+        uint256 total = uint256(
             _schoolingTotal(uint40(block.timestamp), sData, _policy)
         );
         uint256 index;
@@ -142,7 +142,7 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         for (uint256 i = 0; i < _policy.alpha; i++) {
             if (
                 _isExistingCheckpoint(_schoolingCheckpoint[i]) &&
-                _schoolingCheckpoint[i] <= schoolingTotal
+                _schoolingCheckpoint[i] <= total
             ) {
                 index = i;
                 counter++;
