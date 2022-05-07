@@ -1,35 +1,93 @@
 # **ERC721AS - Auto Schooling**
 
+## TLDR;
+- ERC721AS is an implementation of auto-staking(or in our case, auto-schooling) to the ERC721A.
+- Zero X Gakuen contract will enable **gas-free** auto staking without requiring you to transfer your NFT from your wallet.
+- ERC721AS is highly scalable to any project who wishes to provide zero-gas staking to its holders and encourage diamond hands.
+
+
+---
+
 ## What is ERC721AS?
----
-ZeroXGakuen's NFTs are alive and grow within school-life. New **GAS FREE** soft stake system ZeroXGakuen has developed makes it possible to stake your NFT without transfering it, and so be alive.
+<div style="padding-left: 15px">
+We created ERC721AS for three simple reasons:
 
-## Why schooling?
----
-TODO
+1) NFTs **can be** more than just jsons and jpegs.
+2) NFTs **can be** more closely aligned with the project's narrative.
+3) ...ETH gas fee is not kawaii.
 
-# **How it works**
-TODO
+ERC721AS will give life to your Zero X Gakuen NFTs. Your NFT will not be just a constant data set, but a living being that grows within its school life.
 
-## Grading
----
-TODO
+After looking thoroughly at the soft-staking(a.k.a. nesting) concept that Moonbirds have introduced, we thought the concept itself is here to stay, but the contract had a room for improvement in terms of optimization and scalability.
 
-# **License**
-### MIT License
+That's how we designed ERC721AS; a gas-free, developer-friendly contract that enables auto-staking.
+
+With our design, staking is done without requiring you to transfer your NFT nor pay gas fee by clicking a 'stake button', or in our case, 'schooling button'.
+</div>
+
+
+## Why do we need Schooling?
+<div style="padding-left: 15px">
+In terms of utilitarian perspective, schooling mainly performs in two ways:
+
+1) Rewarding system for diamond hands,
+2) Accumulating time value to your NFTs.
+
+Therefore, schooling contains many implicative possibilities. Depending on the narrative of every project, schooling can be switched to anything from dungeon adventures, isekai reincarnation to anything that makes your NFT alive and grow within timeframe.
+
+Schooling system is highly scalable to any project who wishes to reward the diamond hands and give rich narrative your NFTs.
+</div>
 
 --- 
-ERC721AS Copyright (c) 2022 OG Inc.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# **How to apply it to your new NFT**
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+## ERC721AS
+- Essential codes
+  - ```IERC721AS.sol```
+  - ```ERC721AS.sol```
+- You should do
+  - ```_applyNewSchoolingPolicy(...)``` to start new schooling season.
+  - override ```_beforeTokenTransfers(...)``` to prevent record data.
+  - override ```_beforeApplyNewPolicy(...)``` to hook before new policy is applied.
+  - override ```_afterApplyNewPolicy(...)``` to hook after new policy is applied.
+- You should not do
+  - ```_setSchoolingXXXX(...)``` to change schooling policy without any acceptable reason.
+  - ```_recordSchoolingStatusChange(...)``` to record schooling status without any acceptable reason.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+## Extensions
+- ERC721AS VariableURI
+  - override ```tokenURI(...)``` to return ```schoolingURI``` based on ```schoolingCheckpoint```
+  - ```mapping(index=>string) _schoolingCheckpoint``` holds checkpoint
+  - ```mapping(index=>string) _schoolingURI``` holds URIs
+  - ```_addCheckpoint(...)``` to add new checkpoint & URI
+  - ```_replaceCheckpoint(...)``` to replace existing checkpoint
+  - ```_removeCheckpoint(...)``` to remove existing checpoint
+  - ```uriAtIndex``` to get uri at index(0, ..., numOfCheckpoint-1)
+  - ```checkpointAtIndex``` to get uri at index(0, ..., numOfCheckpoint-1)
+- ERC721AS Burnarable
+  - ```burn()``` to burn NFT by NFT's owner
+          
+- ERC721AS Memorable
+  - ```mapping(uint8=>mapping(uint256=>TokenStatus)) _schoolingRecords``` holds schooling data
+  - ```mapping(uint8=>SchoolingPolicy) _policyRecords``` holds schooling policy
+  - ```_recordPolicy(...)``` to record schooling policy before new schooling season, by deployer
+  - ```recordMemory(...)``` to record schooling data before new schooling season, by NFT's owner
+
+## Agenda
+- Make your NFT alive
+- Make your NFT grow
+- Make holder of your NFT excited
+- Start new season with fresh mind
+- Do not hesitate to reward NFT holders
 
 ---
-powered by ERC721A, Copyright (c) 2022 Chiru Labs
 
+# **License**
+
+[MIT LICENSE](./LICENSE.txt)
+
+---
 # **Contact**
 - MoeKun (Developer) - [@MoeKun_XD](https://twitter.com/MoeKun_XD)
 - JayB (Developer) - [@JH_BAAn](https://twitter.com/JH_BAAn)

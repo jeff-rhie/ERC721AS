@@ -12,7 +12,7 @@ describe("ERC721ASVariableURI", async function () {
 
   context(`Schooling Checkpoint`, function () {
     it(`addCheckpoint * 5 -> remove(2) -> replace(1),(3) -> test`, async function () {
-      const simTime = Math.floor(Date.now() / 1000) + 300000;
+      const simTime = Math.floor(Date.now() / 1000) + 3000000;
       const toCheckpoint = (t) => { return (t % 2 == 1) ? t - 1 : t; };
 
       await network.provider.send("evm_setNextBlockTimestamp", [simTime]);
