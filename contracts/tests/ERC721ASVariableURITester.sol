@@ -14,24 +14,24 @@ contract ERC721ASVariableURITester is ERC721ASVariableURI {
         _safeMint(to, amount, "");
     }
 
-    function setSchoolingBegin(uint256 begin) public {
-        _setSchoolingBegin(uint40(begin));
+    function setStakingBegin(uint256 begin) public {
+        _setStakingBegin(uint40(begin));
     }
 
-    function setSchoolingEnd(uint256 end) public {
-        _setSchoolingEnd(uint40(end));
+    function setStakingEnd(uint256 end) public {
+        _setStakingEnd(uint40(end));
     }
 
-    function setSchoolingBreaktime(uint256 breaktime) public {
-        _setSchoolingBreaktime(uint40(breaktime));
+    function setStakingBreaktime(uint256 breaktime) public {
+        _setStakingBreaktime(uint40(breaktime));
     }
 
-    function applyNewSchoolingPolicy(
+    function applyNewStakingPolicy(
         uint256 _begin,
         uint256 _end,
         uint256 _breaktime
     ) public {
-        _applyNewSchoolingPolicy(
+        _applyNewStakingPolicy(
             uint40(_begin),
             uint40(_end),
             uint40(_breaktime)

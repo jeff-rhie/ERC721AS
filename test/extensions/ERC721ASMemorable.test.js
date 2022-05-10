@@ -10,7 +10,7 @@ describe("ERC721ASMemorable", async function () {
     [owner, user, ...addrList] = await ethers.getSigners();
   });
 
-  context(`Schooling Record`, function () {
+  context(`Staking Record`, function () {
     it(`addCheckpoint * 5 -> remove(2) -> replace(1),(3) -> test`, async function () {
       const simTime = Math.floor(Date.now() / 1000) + 300000;
 
@@ -38,7 +38,7 @@ describe("ERC721ASMemorable", async function () {
           (await tester.getRecordedPolicyId(0)).toNumber()
       ).to.equal(0);
 
-      await tester.applyNewSchoolingPolicy(simTime+100, simTime+300, 10);
+      await tester.applyNewStakingPolicy(simTime+100, simTime+300, 10);
       await tester.recordPolicy();
       expect(
           (await tester.getRecordedBegin(0)).toNumber()
@@ -56,14 +56,14 @@ describe("ERC721ASMemorable", async function () {
           (await tester.getRecordedPolicyId(0)).toNumber()
       ).to.equal(0);
       /**
-       * init Schooling Policy
+       * init Staking Policy
        *
        * (begin, end, break)  =  (simTime+500, simTime+9000, 1000)
        * 
        */
-      await tester.setSchoolingBegin(simTime + 500);
-      await tester.setSchoolingEnd(simTime + 9000);
-      await tester.setSchoolingBreaktime(1000);
+      await tester.setStakingBegin(simTime + 500);
+      await tester.setStakingEnd(simTime + 9000);
+      await tester.setStakingBreaktime(1000);
       await tester.recordPolicy();
       expect(
           (await tester.getRecordedBegin(0)).toNumber()
@@ -81,9 +81,9 @@ describe("ERC721ASMemorable", async function () {
           (await tester.getRecordedPolicyId(0)).toNumber()
       ).to.equal(0);
 
-      expect((await tester.schoolingBegin()).toNumber()).to.equal(simTime + 500);
-      expect((await tester.schoolingEnd()).toNumber()).to.equal(simTime + 9000);
-      expect((await tester.schoolingBreaktime()).toNumber()).to.equal(1000);
+      expect((await tester.stakingBegin()).toNumber()).to.equal(simTime + 500);
+      expect((await tester.stakingEnd()).toNumber()).to.equal(simTime + 9000);
+      expect((await tester.stakingBreaktime()).toNumber()).to.equal(1000);
 
       // transfer 11 from user to owner
       await network.provider.send("evm_setNextBlockTimestamp", [simTime + 100]);

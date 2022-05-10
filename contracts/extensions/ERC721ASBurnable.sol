@@ -15,7 +15,7 @@ abstract contract ERC721ASBurnable is ERC721AS, IERC721ASBurnable {
      * Requirement:
      *
      * - The caller must own 'tokenId' or an approved operator.
-     * - Does not matter whether it is on schooling or off schooling.
+     * - Does not matter whether it is on staking or off staking.
      *   Can burn 'tokenId' at anytime.
      */
     function burn(uint256 tokenId) external virtual override {

@@ -10,7 +10,7 @@ describe("ERC721ASVariableURI", async function () {
     [owner, user, ...addrList] = await ethers.getSigners();
   });
 
-  context(`Schooling Checkpoint`, function () {
+  context(`Staking Checkpoint`, function () {
     it(`addCheckpoint * 5 -> remove(2) -> replace(1),(3) -> test`, async function () {
       const simTime = Math.floor(Date.now() / 1000) + 3000000;
       const toCheckpoint = (t) => { return (t % 2 == 1) ? t - 1 : t; };
@@ -78,7 +78,7 @@ describe("ERC721ASVariableURI", async function () {
         expect(true).to.equal(true);
       }
 
-      tester.applyNewSchoolingPolicy(simTime+100, simTime+300, 10);
+      tester.applyNewStakingPolicy(simTime+100, simTime+300, 10);
 
       try {
         await tester.checkpointAtIndex(0);
@@ -149,18 +149,18 @@ describe("ERC721ASVariableURI", async function () {
 
 
       /**
-       * init Schooling Policy
+       * init Staking Policy
        *
        * (begin, end, break)  =  (simTime+500, simTime+9000, 1000)
        * 
        */
-      tester.setSchoolingBegin(simTime + 500);
-      tester.setSchoolingEnd(simTime + 9000);
-      tester.setSchoolingBreaktime(1000);
+      tester.setStakingBegin(simTime + 500);
+      tester.setStakingEnd(simTime + 9000);
+      tester.setStakingBreaktime(1000);
 
-      expect((await tester.schoolingBegin()).toNumber()).to.equal(simTime + 500);
-      expect((await tester.schoolingEnd()).toNumber()).to.equal(simTime + 9000);
-      expect((await tester.schoolingBreaktime()).toNumber()).to.equal(1000);
+      expect((await tester.stakingBegin()).toNumber()).to.equal(simTime + 500);
+      expect((await tester.stakingEnd()).toNumber()).to.equal(simTime + 9000);
+      expect((await tester.stakingBreaktime()).toNumber()).to.equal(1000);
 
       // transfer 11 from user to owner
       await network.provider.send("evm_setNextBlockTimestamp", [simTime + 100]);
@@ -170,14 +170,14 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(11)).toNumber() - (simTime + 100)
+          (await tester.stakingTimestamp(11)).toNumber() - (simTime + 100)
         ) < 2
       ).to.equal(
         true
       );
-      expect((await tester.schoolingTimestamp(1)).toNumber()).to.equal(0);
-      expect((await tester.schoolingTotal(11)).toNumber()).to.equal(0);
-      expect((await tester.schoolingTotal(1)).toNumber()).to.equal(0);
+      expect((await tester.stakingTimestamp(1)).toNumber()).to.equal(0);
+      expect((await tester.stakingTotal(11)).toNumber()).to.equal(0);
+      expect((await tester.stakingTotal(1)).toNumber()).to.equal(0);
 
       // transfer 15 from user to owner
       // expect breaktime
@@ -188,7 +188,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(15)).toNumber() - (simTime + 800)
+          (await tester.stakingTimestamp(15)).toNumber() - (simTime + 800)
         ) < 2
       ).to.equal(
         true
@@ -196,21 +196,21 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTotal(15)).toNumber() - 300
+          (await tester.stakingTotal(15)).toNumber() - 300
         ) < 4
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(11)).toNumber() - 300
+          (await tester.stakingTotal(11)).toNumber() - 300
         ) < 4
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(1)).toNumber() - 300
+          (await tester.stakingTotal(1)).toNumber() - 300
         ) < 4
       ).to.equal(
         true
@@ -228,7 +228,7 @@ describe("ERC721ASVariableURI", async function () {
       //check timestamp
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(15)).toNumber() - (simTime + 800)
+          (await tester.stakingTimestamp(15)).toNumber() - (simTime + 800)
         ) < 2
       ).to.equal(
         true
@@ -236,7 +236,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(11)).toNumber() - (simTime + 100)
+          (await tester.stakingTimestamp(11)).toNumber() - (simTime + 100)
         ) < 2
       ).to.equal(
         true
@@ -244,7 +244,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(1)).toNumber() - (0)
+          (await tester.stakingTimestamp(1)).toNumber() - (0)
         ) < 2
       ).to.equal(
         true
@@ -253,21 +253,21 @@ describe("ERC721ASVariableURI", async function () {
       //check total
       expect(
         Math.abs(
-          (await tester.schoolingTotal(15)).toNumber() - 300
+          (await tester.stakingTotal(15)).toNumber() - 300
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(11)).toNumber() - 1000
+          (await tester.stakingTotal(11)).toNumber() - 1000
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(1)).toNumber() - 1000
+          (await tester.stakingTotal(1)).toNumber() - 1000
         ) < 2
       ).to.equal(
         true
@@ -295,21 +295,21 @@ describe("ERC721ASVariableURI", async function () {
       //check total
       expect(
         Math.abs(
-          (await tester.schoolingTotal(15)).toNumber() - 1500
+          (await tester.stakingTotal(15)).toNumber() - 1500
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(11)).toNumber() - 2500
+          (await tester.stakingTotal(11)).toNumber() - 2500
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(1)).toNumber() - 2500
+          (await tester.stakingTotal(1)).toNumber() - 2500
         ) < 2
       ).to.equal(
         true
@@ -331,7 +331,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(15)).toNumber() - (simTime + 6000)
+          (await tester.stakingTimestamp(15)).toNumber() - (simTime + 6000)
         ) < 2
       ).to.equal(
         true
@@ -345,21 +345,21 @@ describe("ERC721ASVariableURI", async function () {
       //check total
       expect(
         Math.abs(
-          (await tester.schoolingTotal(15)).toNumber() - 3500
+          (await tester.stakingTotal(15)).toNumber() - 3500
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(11)).toNumber() - 6500
+          (await tester.stakingTotal(11)).toNumber() - 6500
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(1)).toNumber() - 6500
+          (await tester.stakingTotal(1)).toNumber() - 6500
         ) < 2
       ).to.equal(
         true
@@ -379,7 +379,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(11)).toNumber() - (simTime + 8800)
+          (await tester.stakingTimestamp(11)).toNumber() - (simTime + 8800)
         ) < 2
       ).to.equal(
         true
@@ -391,7 +391,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(1)).toNumber() - (0)
+          (await tester.stakingTimestamp(1)).toNumber() - (0)
         ) < 2
       ).to.equal(
         true
@@ -400,7 +400,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(11)).toNumber() - (simTime + 8800)
+          (await tester.stakingTimestamp(11)).toNumber() - (simTime + 8800)
         ) < 2
       ).to.equal(
         true
@@ -409,7 +409,7 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTimestamp(15)).toNumber() - (simTime + 6000)
+          (await tester.stakingTimestamp(15)).toNumber() - (simTime + 6000)
         ) < 2
       ).to.equal(
         true
@@ -417,21 +417,21 @@ describe("ERC721ASVariableURI", async function () {
 
       expect(
         Math.abs(
-          (await tester.schoolingTotal(15)).toNumber() - 5500
+          (await tester.stakingTotal(15)).toNumber() - 5500
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(11)).toNumber() - 8300
+          (await tester.stakingTotal(11)).toNumber() - 8300
         ) < 2
       ).to.equal(
         true
       );
       expect(
         Math.abs(
-          (await tester.schoolingTotal(1)).toNumber() - 8500
+          (await tester.stakingTotal(1)).toNumber() - 8500
         ) < 2
       ).to.equal(
         true

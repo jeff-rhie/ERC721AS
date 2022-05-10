@@ -1,65 +1,42 @@
-# **ERC721AS - Auto Schooling**
+# **ERC721AS - Auto Staking**
 
-## TLDR;
-- ERC721AS is an implementation of auto-staking(or in our case, auto-schooling) to the ERC721A.
-- Zero X Gakuen contract will enable **gas-free** auto staking without requiring you to transfer your NFT from your wallet.
-- ERC721AS is highly scalable to any project who wishes to provide zero-gas staking to its holders and encourage diamond hands.
-
-
----
+## TL;DR
+- ERC721AS is an zero-gas staking system for NFTs that does not require holders to ‘actively prove’ their holding status.
+- Zero X Gakuen contract will enable staking multiple NFTs without any gas fee created.
+- We provide it as open-source to accommodate best holder-experience for the broader community.
 
 ## What is ERC721AS?
-<div style="padding-left: 15px">
-We created ERC721AS for three simple reasons:
 
-1) NFTs **can be** more than just jsons and jpegs.
-2) NFTs **can be** more closely aligned with the project's narrative.
-3) ...ETH gas fee is not kawaii.
+We are here to introduce ERC721AS, an Auto-Staking system for NFTs. Auto-staking is automatic staking (literally!) without requiring you to transfer your asset into another pool nor pay any gas fee during the process. With ERC721AS, you just have to hold passively. No requirements to prove your holding status whatsoever.
 
-ERC721AS will give life to your Zero X Gakuen NFTs. Your NFT will not be just a constant data set, but a living being that grows within its school life.
+Traditional staking requires the holder to ‘actively’ prove his/her holding status. You had to click the staking button, transfer the token to a staking pool, receive another token as a proof, and so on… To be honest, it kills holder-experience, sets a high threshold for beginners and most importantly, IT DOESN’T HAVE TO BE THIS WAY.
 
-After looking thoroughly at the soft-staking(a.k.a. nesting) concept that Moonbirds have introduced, we thought the concept itself is here to stay, but the contract had a room for improvement in terms of optimization and scalability.
+The core idea of staking is to give time value. (nothing more.) Conventional staking where you, as a holder, have to prove your holding status by transferring your asset and paying gas fee is just ‘bad mechanics’.
 
-That's how we designed ERC721AS; a gas-free, developer-friendly contract that enables auto-staking.
-
-With our design, staking is done without requiring you to transfer your NFT nor pay gas fee by clicking a 'stake button', or in our case, 'schooling button'.
-</div>
+That is why we introduce ERC721AS, a new standard based on the first principle of staking. We abstracted the process by exceptionally focusing on giving time value.
 
 
-## Why do we need Schooling?
-<div style="padding-left: 15px">
-In terms of utilitarian perspective, schooling mainly performs in two ways:
 
-1) Rewarding system for diamond hands,
-2) Accumulating time value to your NFTs.
-
-Therefore, schooling contains many implicative possibilities. Depending on the narrative of every project, schooling can be switched to anything from dungeon adventures, isekai reincarnation to anything that makes your NFT alive and grow within timeframe.
-
-Schooling system is highly scalable to any project who wishes to reward the diamond hands and give rich narrative your NFTs.
-</div>
-
---- 
-
-# **How to apply it to your new NFT**
+# **How to apply it to your NFT project**
 
 ## ERC721AS
 - Essential codes
   - ```IERC721AS.sol```
   - ```ERC721AS.sol```
 - You should do
-  - ```_applyNewSchoolingPolicy(...)``` to start new schooling season.
+  - ```_applyNewStakingPolicy(...)``` to start new staking season.
   - override ```_beforeTokenTransfers(...)``` to prevent record data.
   - override ```_beforeApplyNewPolicy(...)``` to hook before new policy is applied.
   - override ```_afterApplyNewPolicy(...)``` to hook after new policy is applied.
 - You should not do
-  - ```_setSchoolingXXXX(...)``` to change schooling policy without any acceptable reason.
-  - ```_recordSchoolingStatusChange(...)``` to record schooling status without any acceptable reason.
+  - ```_setStakingXXXX(...)``` to change staking policy without any acceptable reason.
+  - ```_recordStakingStatusChange(...)``` to record staking status without any acceptable reason.
 
 ## Extensions
 - ERC721AS VariableURI
-  - override ```tokenURI(...)``` to return ```schoolingURI``` based on ```schoolingCheckpoint```
-  - ```mapping(index=>string) _schoolingCheckpoint``` holds checkpoint
-  - ```mapping(index=>string) _schoolingURI``` holds URIs
+  - override ```tokenURI(...)``` to return ```stakingURI``` based on ```stakingCheckpoint```
+  - ```mapping(index=>string) _stakingCheckpoint``` holds checkpoint
+  - ```mapping(index=>string) _stakingURI``` holds URIs
   - ```_addCheckpoint(...)``` to add new checkpoint & URI
   - ```_replaceCheckpoint(...)``` to replace existing checkpoint
   - ```_removeCheckpoint(...)``` to remove existing checpoint
@@ -69,25 +46,16 @@ Schooling system is highly scalable to any project who wishes to reward the diam
   - ```burn()``` to burn NFT by NFT's owner
           
 - ERC721AS Memorable
-  - ```mapping(uint8=>mapping(uint256=>TokenStatus)) _schoolingRecords``` holds schooling data
-  - ```mapping(uint8=>SchoolingPolicy) _policyRecords``` holds schooling policy
-  - ```_recordPolicy(...)``` to record schooling policy before new schooling season, by deployer
-  - ```recordMemory(...)``` to record schooling data before new schooling season, by NFT's owner
+  - ```mapping(uint8=>mapping(uint256=>TokenStatus)) _stakingRecords``` holds staking data
+  - ```mapping(uint8=>StakingPolicy) _policyRecords``` holds staking policy
+  - ```_recordPolicy(...)``` to record staking policy before new staking season, by deployer
+  - ```recordMemory(...)``` to record staking data before new staking season, by NFT's owner
 
-## Agenda
-- Make your NFT alive
-- Make your NFT grow
-- Make holder of your NFT excited
-- Start new season with fresh mind
-- Do not hesitate to reward NFT holders
-
----
 
 # **License**
 
 [MIT LICENSE](./LICENSE.txt)
 
----
 # **Contact**
 - MoeKun (Developer) - [@MoeKun_XD](https://twitter.com/MoeKun_XD)
 - JayB (Developer) - [@JH_BAAn](https://twitter.com/JH_BAAn)

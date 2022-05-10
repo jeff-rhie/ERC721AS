@@ -73,71 +73,71 @@ interface IERC721AS is IERC721, IERC721Metadata {
     /**
      * The token does not exist.
      */
-    error SchoolingQueryForNonexistentToken();
+    error StakingQueryForNonexistentToken();
 
     // Compiler will pack this into a single 256bit word.
     struct TokenStatus {
         // The address of the owner.
         address owner;
-        // Keeps track of the latest time User toggled schooling.
-        uint40 schoolingTimestamp;
-        // Keeps track of the total time of schooling.
+        // Keeps track of the latest time User toggled staking.
+        uint40 stakingTimestamp;
+        // Keeps track of the total time of staking.
         // Left 4Most bit
-        uint40 schoolingTotal;
+        uint40 stakingTotal;
         // State to support multiple seasons
-        uint8  schoolingId;
+        uint8  stakingId;
         // Whether the token has been burned.
         bool burned;
     }
 
     // Compiler will pack this into a single 256bit word.
-    struct SchoolingPolicy {
+    struct StakingPolicy {
         uint64 alpha;
         uint64 beta;
-        uint40 schoolingBegin;
-        uint40 schoolingEnd;
-        uint8  schoolingId;
+        uint40 stakingBegin;
+        uint40 stakingEnd;
+        uint8  stakingId;
         uint40 breaktime;
     }
 
     /**
-     * @dev Returns total schooling time.
+     * @dev Returns total staking time.
      */
-    function schoolingTotal(uint256 tokenId) external view returns (uint256);
+    function stakingTotal(uint256 tokenId) external view returns (uint256);
 
     /**
-     * @dev Returns latest change time of schooling status.
+     * @dev Returns latest change time of staking status.
      */
-    function schoolingTimestamp(uint256 tokenId)
+    function stakingTimestamp(uint256 tokenId)
         external
         view
         returns (uint256);
 
     /**
-     * @dev Returns whether token is schooling or not.
+     * @dev Returns whether token is staking or not.
      */
     function isTakingBreak(uint256 tokenId) external view returns (bool);
 
     /**
-     * @dev Returns time when schooling begin
+     * @dev Returns time when staking begin
      */
-    function schoolingBegin() external view returns (uint256);
+    function stakingBegin() external view returns (uint256);
 
     /**
-     * @dev Returns time when schooling end
+     * @dev Returns time when staking end
      */
-    function schoolingEnd() external view returns (uint256);
+    function stakingEnd() external view returns (uint256);
 
     /**
-     * @dev Returns identifier of schooling phase
+     * @dev Returns identifier of staking phase
      */
-    function schoolingId() external view returns (uint256);
+    function stakingId() external view returns (uint256);
 
     /**
      * @dev Sets the time period which blocks users from transfering their tokens.
      * @dev Will stay on current grade until time goes by.
      */
-    function schoolingBreaktime() external view returns (uint256);
+    function stakingBreaktime() external view returns (uint256);
 
     /**
      * @dev Returns the total amount of tokens stored by the contract.

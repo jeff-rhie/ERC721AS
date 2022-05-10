@@ -8,7 +8,7 @@ import "../interfaces/IERC721ASVariableURI.sol";
 abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
     using Strings for uint256;
     /*
-     * @dev this contract use _schoolingPolicy.alpha & beta
+     * @dev this contract use _stakingPolicy.alpha & beta
      * - alpha : current index
      * - beta : number of checkpoint
      */
@@ -20,42 +20,42 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
     uint256 internal constant CHECKPOINT_GENERATEDMASK =
         uint256(18446744073709551614);
 
-    // Array to hold schooling checkpoint
-    mapping(uint256 => uint256) internal _schoolingCheckpoint;
+    // Array to hold staking checkpoint
+    mapping(uint256 => uint256) internal _stakingCheckpoint;
 
-    // Array to hold URI based on schooling checkpoint
-    mapping(uint256 => string) internal _schoolingURI;
+    // Array to hold URI based on staking checkpoint
+    mapping(uint256 => string) internal _stakingURI;
 
     /**
-     * @dev Adding new schooling checkpoint, schoolingURI and schoolingURI.
+     * @dev Adding new staking checkpoint, stakingURI and stakingURI.
      */
-    function _addCheckpoint(uint256 checkpoint, string memory schoolingURI)
+    function _addCheckpoint(uint256 checkpoint, string memory stakingURI)
         internal
         virtual
     {
-        SchoolingPolicy memory _policy = _schoolingPolicy;
-        _schoolingCheckpoint[_policy.alpha] = (checkpoint &
+        StakingPolicy memory _policy = _stakingPolicy;
+        _stakingCheckpoint[_policy.alpha] = (checkpoint &
             CHECKPOINT_GENERATEDMASK);
-        _schoolingURI[_policy.alpha] = schoolingURI;
+        _stakingURI[_policy.alpha] = stakingURI;
 
         _policy.alpha++;
         _policy.beta++;
-        // Update schoolingPolicy.
-        _schoolingPolicy = _policy;
+        // Update stakingPolicy.
+        _stakingPolicy = _policy;
     }
 
     function _removeCheckpoint(uint256 index) internal virtual {
         uint256 i = 0;
         uint256 counter = 0;
-        if (_schoolingPolicy.beta <= index) revert CheckpointOutOfArray();
+        if (_stakingPolicy.beta <= index) revert CheckpointOutOfArray();
         while (true) {
-            if (_isExistingCheckpoint(_schoolingCheckpoint[i])) {
+            if (_isExistingCheckpoint(_stakingCheckpoint[i])) {
                 counter++;
             }
             // Checkpoint deleting sequence.
             if (counter > index) {
-                _schoolingCheckpoint[i] |= CHECKPOINT_DELETEDMASK;
-                _schoolingPolicy.beta--;
+                _stakingCheckpoint[i] |= CHECKPOINT_DELETEDMASK;
+                _stakingPolicy.beta--;
                 return;
             }
             i++;
@@ -68,23 +68,23 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
      */
     function _replaceCheckpoint(
         uint256 checkpoint,
-        string memory schoolingURI,
+        string memory stakingURI,
         uint256 index
     ) internal virtual {
         uint256 i = 0;
         uint256 counter = 0;
-        if (_schoolingPolicy.beta <= index) revert CheckpointOutOfArray();
+        if (_stakingPolicy.beta <= index) revert CheckpointOutOfArray();
         // counter always syncs with index+1.
         // After satisfying second "if" condition, it will return.
         // Therefore, while condition will never loops infinitely.
         while (true) {
-            if (_isExistingCheckpoint(_schoolingCheckpoint[i])) {
+            if (_isExistingCheckpoint(_stakingCheckpoint[i])) {
                 counter++;
             }
             // Checkpoint and uri replacing sequence.
             if (counter > index) {
-                _schoolingCheckpoint[i] = checkpoint;
-                _schoolingURI[i] = schoolingURI;
+                _stakingCheckpoint[i] = checkpoint;
+                _stakingURI[i] = stakingURI;
                 return;
             }
             i++;
@@ -114,8 +114,8 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         returns (string memory)
     {
         if (!_exists(tokenId)) revert URIQueryForNonexistentToken();
-        // Returns baseURI depending on schooling status.
-        string memory baseURI = _getSchoolingURI(tokenId);
+        // Returns baseURI depending on staking status.
+        string memory baseURI = _getStakingURI(tokenId);
         return
             bytes(baseURI).length != 0
                 ? string(abi.encodePacked(baseURI, tokenId.toString()))
@@ -123,26 +123,26 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
     }
 
     /**
-     * @dev Returns on schooling URI of 'tokenId'.
-     * @dev Depending on total schooling time.
+     * @dev Returns on staking URI of 'tokenId'.
+     * @dev Depending on total staking time.
      */
-    function _getSchoolingURI(uint256 tokenId)
+    function _getStakingURI(uint256 tokenId)
         internal
         view
         virtual
         returns (string memory)
     {
         TokenStatus memory sData = _tokenStatus[tokenId];
-        SchoolingPolicy memory _policy = _schoolingPolicy;
+        StakingPolicy memory _policy = _stakingPolicy;
         uint256 total = uint256(
-            _schoolingTotal(uint40(block.timestamp), sData, _policy)
+            _stakingTotal(uint40(block.timestamp), sData, _policy)
         );
         uint256 index;
         uint256 counter = 0;
         for (uint256 i = 0; i < _policy.alpha; i++) {
             if (
-                _isExistingCheckpoint(_schoolingCheckpoint[i]) &&
-                _schoolingCheckpoint[i] <= total
+                _isExistingCheckpoint(_stakingCheckpoint[i]) &&
+                _stakingCheckpoint[i] <= total
             ) {
                 index = i;
                 counter++;
@@ -154,12 +154,12 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
             return _baseURI();
         }
 
-        return _schoolingURI[index];
+        return _stakingURI[index];
     }
 
     /**
      * Get URI at certain index.
-     * index can be identified as schooling.
+     * index can be identified as staking.
      */
     function uriAtIndex(uint256 index)
         external
@@ -167,15 +167,15 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         override
         returns (string memory)
     {
-        if (index >= _schoolingPolicy.beta) revert CheckpointOutOfArray();
+        if (index >= _stakingPolicy.beta) revert CheckpointOutOfArray();
         uint256 i = 0;
         uint256 counter = 0;
         while (true) {
-            if (_isExistingCheckpoint(_schoolingCheckpoint[i])) {
+            if (_isExistingCheckpoint(_stakingCheckpoint[i])) {
                 counter++;
             }
             if (counter > index) {
-                return _schoolingURI[i];
+                return _stakingURI[i];
             }
             i++;
         }
@@ -183,7 +183,7 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
 
     /**
      * Get Checkpoint at certain index.
-     * index can be identified as schooling.
+     * index can be identified as staking.
      */
     function checkpointAtIndex(uint256 index)
         external
@@ -191,15 +191,15 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         override
         returns (uint256)
     {
-        if (index >= _schoolingPolicy.beta) revert CheckpointOutOfArray();
+        if (index >= _stakingPolicy.beta) revert CheckpointOutOfArray();
         uint256 i = 0;
         uint256 counter = 0;
         while (true) {
-            if (_isExistingCheckpoint(_schoolingCheckpoint[i])) {
+            if (_isExistingCheckpoint(_stakingCheckpoint[i])) {
                 counter++;
             }
             if (counter > index) {
-                return _schoolingCheckpoint[i];
+                return _stakingCheckpoint[i];
             }
             i++;
         }
@@ -207,14 +207,14 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
 
     // returns number of checkpoints not deleted
     function numOfCheckpoints() external view override returns (uint256) {
-        return _schoolingPolicy.beta;
+        return _stakingPolicy.beta;
     }
 
     /**
-     * @dev Hook that is called before call applyNewSchoolingPolicy.
+     * @dev Hook that is called before call applyNewStakingPolicy.
      *
-     * _begin     - timestamp schooling begin
-     * _end       - timestamp schooling end
+     * _begin     - timestamp staking begin
+     * _end       - timestamp staking end
      * _breaktime - breaktime in second
      */
     function _beforeApplyNewPolicy(
@@ -223,10 +223,10 @@ abstract contract ERC721ASVariableURI is ERC721AS, IERC721ASVariableURI {
         uint40 _breaktime
     ) internal virtual override {
         super._beforeApplyNewPolicy(_begin, _end, _breaktime);
-        SchoolingPolicy memory _policy = _schoolingPolicy;
+        StakingPolicy memory _policy = _stakingPolicy;
         _policy.alpha = 0;
         _policy.beta = 0;
 
-        _schoolingPolicy = _policy;
+        _stakingPolicy = _policy;
     }
 }

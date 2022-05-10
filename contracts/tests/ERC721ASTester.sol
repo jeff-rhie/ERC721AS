@@ -14,36 +14,36 @@ contract ERC721ASTester is ERC721AS {
         _safeMint(to, amount, "");
     }
 
-    function getSchoolingAlpha() public view returns (uint256) {
-        return _getSchoolingAlpha();
+    function getStakingAlpha() public view returns (uint256) {
+        return _getStakingAlpha();
     }
 
-    function setSchoolingAlpha(uint256 alpha) public {
-        _setSchoolingAlpha(uint64(alpha));
+    function setStakingAlpha(uint256 alpha) public {
+        _setStakingAlpha(uint64(alpha));
     }
 
-    function getSchoolingBeta() public view returns (uint256) {
-        return _getSchoolingBeta();
+    function getStakingBeta() public view returns (uint256) {
+        return _getStakingBeta();
     }
 
-    function setSchoolingBeta(uint256 beta) public {
-        _setSchoolingBeta(uint64(beta));
+    function setStakingBeta(uint256 beta) public {
+        _setStakingBeta(uint64(beta));
     }
 
-    function setSchoolingBegin(uint256 begin) public {
-        _setSchoolingBegin(uint40(begin));
+    function setStakingBegin(uint256 begin) public {
+        _setStakingBegin(uint40(begin));
     }
 
-    function setSchoolingEnd(uint256 end) public {
-        _setSchoolingEnd(uint40(end));
+    function setStakingEnd(uint256 end) public {
+        _setStakingEnd(uint40(end));
     }
 
-    function setSchoolingBreaktime(uint256 breaktime) public {
-        _setSchoolingBreaktime(uint40(breaktime));
+    function setStakingBreaktime(uint256 breaktime) public {
+        _setStakingBreaktime(uint40(breaktime));
     }
 
-    function applyNewSchoolingPolicy(uint256 _begin, uint256 _end, uint256 _breaktime) public {
-        _applyNewSchoolingPolicy(
+    function applyNewStakingPolicy(uint256 _begin, uint256 _end, uint256 _breaktime) public {
+        _applyNewStakingPolicy(
             uint40(_begin),
             uint40(_end),
             uint40(_breaktime)

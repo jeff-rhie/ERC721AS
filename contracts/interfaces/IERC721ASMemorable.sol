@@ -11,7 +11,7 @@ interface IERC721ASMemorable {
      * - with owner at time when data recorded
      * - with timestamp when data recorded
      * - with total at time when data recorded
-     * - with current schoolingId
+     * - with current stakingId
      */
     function recordMemory(uint256 tokenId) external virtual;
 }

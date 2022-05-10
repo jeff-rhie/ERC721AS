@@ -6,7 +6,7 @@ import "../interfaces/IERC721ASMemorable.sol";
 
 /**
  * @title ERC721AS Memorable
- * @dev ERC721AS Token that can be recorded their schooling data
+ * @dev ERC721AS Token that can be recorded their staking data
  */
 
 abstract contract ERC721ASMemorable is ERC721AS, IERC721ASMemorable {
@@ -16,38 +16,38 @@ abstract contract ERC721ASMemorable is ERC721AS, IERC721ASMemorable {
      * Requirement:
      *
      * - The caller must own 'tokenId' or an approved operator.
-     * - Does not matter whether it is on schooling or off schooling.
+     * - Does not matter whether it is on staking or off staking.
      *   Can save 
      */
 
     /*
-     * mapping(schoolingId => mapping(tokenId => TokenStatus))
+     * mapping(stakingId => mapping(tokenId => TokenStatus))
      */
-    mapping(uint8=>mapping(uint256=>TokenStatus)) internal _schoolingRecords;
+    mapping(uint8=>mapping(uint256=>TokenStatus)) internal _stakingRecords;
 
     /*
-     * mapping(schoolingId => SchoolingPolicy)
+     * mapping(stakingId => StakingPolicy)
      */
-    mapping(uint8=>SchoolingPolicy) internal _policyRecords;
+    mapping(uint8=>StakingPolicy) internal _policyRecords;
 
     function _recordMemory(uint256 tokenId) internal {
         TokenStatus memory _status = _tokenStatus[tokenId];
-        SchoolingPolicy memory _policy = _schoolingPolicy;
+        StakingPolicy memory _policy = _stakingPolicy;
         uint40 currentTime = uint40(block.timestamp);
 
-        _status.schoolingTotal = uint40(_schoolingTotal(currentTime, _status,  _policy));
-        _status.schoolingTimestamp = currentTime;
-        _status.schoolingId = _policy.schoolingId;
+        _status.stakingTotal = uint40(_stakingTotal(currentTime, _status,  _policy));
+        _status.stakingTimestamp = currentTime;
+        _status.stakingId = _policy.stakingId;
 
         /**
          * @dev it Doesn't change _tokenStatus because
          * We don't want to make NFT take breaktime for recording their memory.
          */
-        _schoolingRecords[_status.schoolingId][tokenId] = _status;
+        _stakingRecords[_status.stakingId][tokenId] = _status;
     }
 
     function _recordPolicy() internal {
-        _policyRecords[_schoolingPolicy.schoolingId] = _schoolingPolicy;
+        _policyRecords[_stakingPolicy.stakingId] = _stakingPolicy;
     }
 
     function recordMemory(uint256 tokenId) external virtual override {

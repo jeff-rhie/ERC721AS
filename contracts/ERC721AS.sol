@@ -46,7 +46,7 @@ import "./IERC721AS.sol";
 //
 //
 /// @title ERC721AS
-/// ERC721AS for 'A'uto 'S'chooling & Zero x 'G'akuen NFT smart contract
+/// ERC721AS for 'A'uto 'S'taking & Zero x Gakuen NFT smart contract
 /// @author MoeKun
 /// @author JayB
 contract ERC721AS is Context, ERC165, IERC721AS {
@@ -79,9 +79,9 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
     /*
-    * @dev see { IERC721AS - SchoolingPolicy }
+    * @dev see { IERC721AS - StakingPolicy }
     */
-    SchoolingPolicy internal _schoolingPolicy;
+    StakingPolicy internal _stakingPolicy;
 
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
@@ -97,7 +97,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     }
 
     /**
-     * Returns whether token is schooling or not.
+     * Returns whether token is staking or not.
      */
     function isTakingBreak(uint256 tokenId)
         external
@@ -105,21 +105,21 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         override
         returns (bool)
     {
-        if (!_exists(tokenId)) revert SchoolingQueryForNonexistentToken();
+        if (!_exists(tokenId)) revert StakingQueryForNonexistentToken();
         return _isTakingBreak(tokenId);
     }
 
     /**
-     * Returns latest change time of schooling status.
+     * Returns latest change time of staking status.
      */
-    function schoolingTimestamp(uint256 tokenId)
+    function stakingTimestamp(uint256 tokenId)
         external
         view
         override
         returns (uint256)
     {
-        if (!_exists(tokenId)) revert SchoolingQueryForNonexistentToken();
-        return uint256(_tokenStatus[tokenId].schoolingTimestamp);
+        if (!_exists(tokenId)) revert StakingQueryForNonexistentToken();
+        return uint256(_tokenStatus[tokenId].stakingTimestamp);
     }
 
     /**
@@ -129,71 +129,71 @@ contract ERC721AS is Context, ERC165, IERC721AS {
      * Returns token's total time of shcooling.
      * Used for optimizing and readablilty.
      */
-    function _schoolingTotal(
+    function _stakingTotal(
         uint40 currentTime,
         TokenStatus memory _status,
-        SchoolingPolicy memory _policy
+        StakingPolicy memory _policy
     ) internal pure virtual returns (uint256) {
-        // If schooling is on different phase, existing total = 0
-        if (_status.schoolingId != _policy.schoolingId) {
-            _status.schoolingTotal = 0;
+        // If staking is on different phase, existing total = 0
+        if (_status.stakingId != _policy.stakingId) {
+            _status.stakingTotal = 0;
         }
 
-        // If schooling is not begun yet, total = 0
-        if (_policy.schoolingBegin == 0 || currentTime < _policy.schoolingBegin) {
+        // If staking is not begun yet, total = 0
+        if (_policy.stakingBegin == 0 || currentTime < _policy.stakingBegin) {
             return 0;
         }
 
-        // If schooling is End, 
-        if (_policy.schoolingEnd < currentTime) {
-            if (_status.schoolingTimestamp < _policy.schoolingBegin) {
-                return uint256(_policy.schoolingEnd - _policy.schoolingBegin);
+        // If staking is End, 
+        if (_policy.stakingEnd < currentTime) {
+            if (_status.stakingTimestamp < _policy.stakingBegin) {
+                return uint256(_policy.stakingEnd - _policy.stakingBegin);
             }
-            if (_status.schoolingTimestamp + _policy.breaktime > _policy.schoolingEnd) {
-                return uint256(_status.schoolingTotal);
+            if (_status.stakingTimestamp + _policy.breaktime > _policy.stakingEnd) {
+                return uint256(_status.stakingTotal);
             }
             return uint256(
-                _status.schoolingTotal +
-                _policy.schoolingEnd -
+                _status.stakingTotal +
+                _policy.stakingEnd -
                 _policy.breaktime -
-                _status.schoolingTimestamp
+                _status.stakingTimestamp
             );
         }
 
         if (
-            _status.schoolingTimestamp == 0 ||
-            _status.schoolingTimestamp < _policy.schoolingBegin
+            _status.stakingTimestamp == 0 ||
+            _status.stakingTimestamp < _policy.stakingBegin
         ) {
-            return uint256(currentTime - _policy.schoolingBegin);
+            return uint256(currentTime - _policy.stakingBegin);
         }
 
-        if (_status.schoolingTimestamp + _policy.breaktime > currentTime) {
-            return uint256(_status.schoolingTotal);
+        if (_status.stakingTimestamp + _policy.breaktime > currentTime) {
+            return uint256(_status.stakingTotal);
         }
 
         return uint256(
-            _status.schoolingTotal +
+            _status.stakingTotal +
             currentTime -
-            _status.schoolingTimestamp -
+            _status.stakingTimestamp -
             _policy.breaktime
         );
     }
 
     /**
-     * Returns token's total time of schooling.
+     * Returns token's total time of staking.
      */
-    function schoolingTotal(uint256 tokenId)
+    function stakingTotal(uint256 tokenId)
         external
         view
         override
         returns (uint256)
     {
-        if (!_exists(tokenId)) revert SchoolingQueryForNonexistentToken();
+        if (!_exists(tokenId)) revert StakingQueryForNonexistentToken();
         return
-            _schoolingTotal(
+            _stakingTotal(
                 uint40(block.timestamp),
                 _tokenStatus[tokenId],
-                _schoolingPolicy
+                _stakingPolicy
             );
     }
 
@@ -203,159 +203,159 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     function _isTakingBreak(uint256 tokenId) internal view returns (bool) {
         unchecked {
             return
-                _schoolingPolicy.schoolingBegin != 0 &&
-                block.timestamp >= _schoolingPolicy.schoolingBegin &&
-                _tokenStatus[tokenId].schoolingTimestamp >=
-                _schoolingPolicy.schoolingBegin &&
-                ((_tokenStatus[tokenId].schoolingTimestamp +
-                    _schoolingPolicy.breaktime) > block.timestamp);
+                _stakingPolicy.stakingBegin != 0 &&
+                block.timestamp >= _stakingPolicy.stakingBegin &&
+                _tokenStatus[tokenId].stakingTimestamp >=
+                _stakingPolicy.stakingBegin &&
+                ((_tokenStatus[tokenId].stakingTimestamp +
+                    _stakingPolicy.breaktime) > block.timestamp);
         }
     }
 
     /**
-     * @dev use this to get first custom data in schooling policy.
+     * @dev use this to get first custom data in staking policy.
      */
-    function _getSchoolingAlpha() internal view returns (uint256) {
+    function _getStakingAlpha() internal view returns (uint256) {
         unchecked {
-            return uint256(_schoolingPolicy.alpha);
+            return uint256(_stakingPolicy.alpha);
         }
     }
 
     /**
-     * @dev use this to set first custom data in schooling policy.
+     * @dev use this to set first custom data in staking policy.
      */
-    function _setSchoolingAlpha(uint64 _alpha) internal {
+    function _setStakingAlpha(uint64 _alpha) internal {
         unchecked {
-            _schoolingPolicy.alpha = _alpha;
+            _stakingPolicy.alpha = _alpha;
         }
     }
 
     /**
-     * @dev use this to get second custom data in schooling policy.
+     * @dev use this to get second custom data in staking policy.
      */
-    function _getSchoolingBeta() internal view returns (uint256) {
+    function _getStakingBeta() internal view returns (uint256) {
         unchecked {
-            return uint256(_schoolingPolicy.beta);
+            return uint256(_stakingPolicy.beta);
         }
     }
 
     /**
-     * @dev use this to set second custom data in schooling policy.
+     * @dev use this to set second custom data in staking policy.
      */
-    function _setSchoolingBeta(uint64 _beta) internal {
+    function _setStakingBeta(uint64 _beta) internal {
         unchecked {
-            _schoolingPolicy.beta = _beta;
+            _stakingPolicy.beta = _beta;
         }
     }
 
-    function _setSchoolingBreaktime(uint40 _breaktime) internal {
+    function _setStakingBreaktime(uint40 _breaktime) internal {
         unchecked {
-            _schoolingPolicy.breaktime = _breaktime;
+            _stakingPolicy.breaktime = _breaktime;
         }
     }
 
     /**
-     * @dev set schooling begin manually
+     * @dev set staking begin manually
      * changing it manually could be resulted in unexpected result
      * please do not use it witout reasonable reason
      */
-    function _setSchoolingBegin(uint40 _begin) internal {
+    function _setStakingBegin(uint40 _begin) internal {
         unchecked {
-            _schoolingPolicy.schoolingBegin = _begin;
+            _stakingPolicy.stakingBegin = _begin;
         }
     }
 
     /**
-     * @dev set schooling end manually
+     * @dev set staking end manually
      * changing it manually could be resulted in unexpected result
      * please do not use it witout reasonable reason
      */
-    function _setSchoolingEnd(uint40 _end) internal {
+    function _setStakingEnd(uint40 _end) internal {
         unchecked {
-            _schoolingPolicy.schoolingEnd = _end;
+            _stakingPolicy.stakingEnd = _end;
         }
     }
 
     /**
-     * @dev set schooling identifier manually
+     * @dev set staking identifier manually
      * changing it manually could be resulted in unexpected result
      * please do not use it witout reasonable reason
      */
-    function _setSchoolingId(uint8 _schoolingId) internal {
+    function _setStakingId(uint8 _stakingId) internal {
         unchecked {
-            _schoolingPolicy.schoolingId = _schoolingId;
+            _stakingPolicy.stakingId = _stakingId;
         }
     }
 
     /**
      * Returns period of timelock.
      */
-    function schoolingBreaktime() external view override returns (uint256) {
+    function stakingBreaktime() external view override returns (uint256) {
         unchecked {
-            return uint256(_schoolingPolicy.breaktime);
+            return uint256(_stakingPolicy.breaktime);
         }
     }
 
     /**
-     * Returns when schooling begin in timestamp
+     * Returns when staking begin in timestamp
      */
-    function schoolingBegin() external view override returns (uint256) {
+    function stakingBegin() external view override returns (uint256) {
         unchecked {
-            return uint256(_schoolingPolicy.schoolingBegin);
+            return uint256(_stakingPolicy.stakingBegin);
         }
     }
 
     /**
-     * Returns when schooling end in timestamp
+     * Returns when staking end in timestamp
      */
-    function schoolingEnd() external view override returns (uint256) {
+    function stakingEnd() external view override returns (uint256) {
         unchecked {
-            return uint256(_schoolingPolicy.schoolingEnd);
+            return uint256(_stakingPolicy.stakingEnd);
         }
     }
 
     /**
-     * Returns when schooling identifier
+     * Returns when staking identifier
      */
-    function schoolingId() external view override returns (uint256) {
+    function stakingId() external view override returns (uint256) {
         unchecked {
-            return uint256(_schoolingPolicy.schoolingId);
+            return uint256(_stakingPolicy.stakingId);
         }
     }
 
     /**
-     * Apply new schooling policy.
+     * Apply new staking policy.
      * Please use this function to start new season.
      *
-     * schoolingId will increase automatically.
-     * If new schooling duration is duplicated to existing duration,
+     * stakingId will increase automatically.
+     * If new staking duration is duplicated to existing duration,
      * IT COULD BE ERROR
      */
-    function _applyNewSchoolingPolicy(
+    function _applyNewStakingPolicy(
         uint40 _begin,
         uint40 _end,
         uint40 _breaktime
     ) internal {
         _beforeApplyNewPolicy(_begin, _end, _breaktime);
 
-        SchoolingPolicy memory _policy = _schoolingPolicy;
-        if(_policy.schoolingEnd != 0) {
-            _policy.schoolingId++;
+        StakingPolicy memory _policy = _stakingPolicy;
+        if(_policy.stakingEnd != 0) {
+            _policy.stakingId++;
         }
-        _policy.schoolingBegin = _begin;
-        _policy.schoolingEnd = _end;
+        _policy.stakingBegin = _begin;
+        _policy.stakingEnd = _end;
         _policy.breaktime = _breaktime;
 
-        _schoolingPolicy = _policy;
+        _stakingPolicy = _policy;
 
         _afterApplyNewPolicy(_begin, _end, _breaktime);
     }
 
  /**
-     * @dev Hook that is called before call applyNewSchoolingPolicy.
+     * @dev Hook that is called before call applyNewStakingPolicy.
      *
-     * _begin     - timestamp schooling begin
-     * _end       - timestamp schooling end
+     * _begin     - timestamp staking begin
+     * _end       - timestamp staking end
      * _breaktime - breaktime in second
      */
     function _beforeApplyNewPolicy(
@@ -366,10 +366,10 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     }
 
  /**
-     * @dev Hook that is called before call applyNewSchoolingPolicy.
+     * @dev Hook that is called before call applyNewStakingPolicy.
      *
-     * _begin     - timestamp schooling begin
-     * _end       - timestamp schooling end
+     * _begin     - timestamp staking begin
+     * _end       - timestamp staking end
      * _breaktime - breaktime in second
      */
     function _afterApplyNewPolicy(
@@ -380,18 +380,18 @@ contract ERC721AS is Context, ERC165, IERC721AS {
     }
 
     /**
-     * Switching token's schooling status to off in forced way
+     * Switching token's staking status to off in forced way
      */
 
-    function _recordSchoolingStatusChange(uint256 tokenId) internal {
+    function _recordStakingStatusChange(uint256 tokenId) internal {
         TokenStatus memory _status = _tokenStatus[tokenId];
-        SchoolingPolicy memory _policy = _schoolingPolicy;
+        StakingPolicy memory _policy = _stakingPolicy;
         uint40 currentTime = uint40(block.timestamp);
-        _status.schoolingTotal = uint40(
-            _schoolingTotal(currentTime, _status, _policy)
+        _status.stakingTotal = uint40(
+            _stakingTotal(currentTime, _status, _policy)
         );
-        _status.schoolingId = _schoolingPolicy.schoolingId;
-        _status.schoolingTimestamp = currentTime;
+        _status.stakingId = _stakingPolicy.stakingId;
+        _status.stakingTimestamp = currentTime;
         _tokenStatus[tokenId] = _status;
     }
 
@@ -404,7 +404,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
 * |______|_|  \_\\_____|/_/   |____||_/_/    \_\
 *
 * ERC721A implementation below.
-* - overrided _beforeTokenTransfers to support Auto Schooling
+* - overrided _beforeTokenTransfers to support Auto Staking
 * - remove tracking & keeping it into TokenStatus features
 *
 *
@@ -935,7 +935,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
      * - When `to` is zero, `tokenId` will be burned by `from`.
      * - `from` and `to` are never both zero.
      *
-     * *** IT RECORDS SCHOOLING DATA ***
+     * *** IT RECORDS STAKING DATA ***
      *
      * IF YOU DON'T WANT IT, please override this funcion
      *
@@ -950,7 +950,7 @@ contract ERC721AS is Context, ERC165, IERC721AS {
         uint256 updatedIndex = startTokenId;
         uint256 end = updatedIndex + quantity;
         do {
-            _recordSchoolingStatusChange(updatedIndex++);
+            _recordStakingStatusChange(updatedIndex++);
         } while (updatedIndex != end);
     }
 

@@ -17,63 +17,63 @@ contract ERC721ASMemorableTester is ERC721ASMemorable {
     //transferFrom(address from, address to, uint256 tokenId)
     //safeTransferFrom(address from, address to, uint256 tokenId)
 
-    function applyNewSchoolingPolicy(
+    function applyNewStakingPolicy(
         uint256 _begin,
         uint256 _end,
         uint256 _breaktime
     ) public {
-        _applyNewSchoolingPolicy(
+        _applyNewStakingPolicy(
             uint40(_begin),
             uint40(_end),
             uint40(_breaktime)
         );
     }
 
-    function setSchoolingBegin(uint256 begin) public {
-        _setSchoolingBegin(uint40(begin));
+    function setStakingBegin(uint256 begin) public {
+        _setStakingBegin(uint40(begin));
     }
 
-    function setSchoolingEnd(uint256 end) public {
-        _setSchoolingEnd(uint40(end));
+    function setStakingEnd(uint256 end) public {
+        _setStakingEnd(uint40(end));
     }
 
-    function setSchoolingBreaktime(uint256 breaktime) public {
-        _setSchoolingBreaktime(uint40(breaktime));
-    }
-
-
-    function getRecordedTimestamp(uint8 schoolingId, uint256 tokenId) public view returns(uint256) {
-        return uint256(_schoolingRecords[schoolingId][tokenId].schoolingTimestamp);
-    }
-
-    function getRecordedTotal(uint8 schoolingId, uint256 tokenId) public view returns(uint256) {
-        return uint256(_schoolingRecords[schoolingId][tokenId].schoolingTotal);
-    }
-
-    function getRecordedId(uint8 schoolingId, uint256 tokenId) public view returns(uint256) {
-        return uint256(_schoolingRecords[schoolingId][tokenId].schoolingId);
-    }
-
-    function getRecordedOwner(uint8 schoolingId, uint256 tokenId) public view returns(address) {
-        return _schoolingRecords[schoolingId][tokenId].owner;
+    function setStakingBreaktime(uint256 breaktime) public {
+        _setStakingBreaktime(uint40(breaktime));
     }
 
 
-    function getRecordedBegin(uint8 schoolingId) public view returns(uint256) {
-        return uint256(_policyRecords[schoolingId].schoolingBegin);
+    function getRecordedTimestamp(uint8 stakingId, uint256 tokenId) public view returns(uint256) {
+        return uint256(_stakingRecords[stakingId][tokenId].stakingTimestamp);
     }
 
-    function getRecordedEnd(uint8 schoolingId) public view returns(uint256) {
-        return uint256(_policyRecords[schoolingId].schoolingEnd);
+    function getRecordedTotal(uint8 stakingId, uint256 tokenId) public view returns(uint256) {
+        return uint256(_stakingRecords[stakingId][tokenId].stakingTotal);
     }
 
-    function getRecordedBreaktime(uint8 schoolingId) public view returns(uint256) {
-        return uint256(_policyRecords[schoolingId].breaktime);
+    function getRecordedId(uint8 stakingId, uint256 tokenId) public view returns(uint256) {
+        return uint256(_stakingRecords[stakingId][tokenId].stakingId);
+    }
+
+    function getRecordedOwner(uint8 stakingId, uint256 tokenId) public view returns(address) {
+        return _stakingRecords[stakingId][tokenId].owner;
     }
 
 
-    function getRecordedPolicyId(uint8 schoolingId) public view returns(uint256) {
-        return uint256(_policyRecords[schoolingId].schoolingId);
+    function getRecordedBegin(uint8 stakingId) public view returns(uint256) {
+        return uint256(_policyRecords[stakingId].stakingBegin);
+    }
+
+    function getRecordedEnd(uint8 stakingId) public view returns(uint256) {
+        return uint256(_policyRecords[stakingId].stakingEnd);
+    }
+
+    function getRecordedBreaktime(uint8 stakingId) public view returns(uint256) {
+        return uint256(_policyRecords[stakingId].breaktime);
+    }
+
+
+    function getRecordedPolicyId(uint8 stakingId) public view returns(uint256) {
+        return uint256(_policyRecords[stakingId].stakingId);
     }
 
     function recordPolicy() external {
