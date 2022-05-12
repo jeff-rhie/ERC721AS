@@ -1,6 +1,6 @@
 # **ERC721AS - Auto Staking**
 
-## TL;DR
+## Abstract
 - ERC721AS is an zero-gas staking system for NFTs that does not require holders to ‘actively prove’ their holding status.
 - Zero X Gakuen contract will enable staking multiple NFTs without any gas fee created.
 - We provide it as open-source to accommodate best holder-experience for the broader community.
